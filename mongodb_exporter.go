@@ -73,6 +73,8 @@ var (
 	// FIXME currently ignored
 	// enabledGroupsFlag = flag.String("groups.enabled", "asserts,durability,background_flushing,connections,extra_info,global_lock,index_counters,network,op_counters,op_counters_repl,memory,locks,metrics", "Comma-separated list of groups to use, for more info see: docs.mongodb.org/manual/reference/command/serverStatus/")
 	enabledGroupsFlag = flag.String("groups.enabled", "", "Currently ignored")
+	enabledMongosShardingStat  = flag.Bool("mongos.sharding-stat", false, "whether collect sharding stats from mongos")
+	enabledConfigSvrShardingStat  = flag.Bool("configsvr.sharding-stat", false, "whether collect sharding stats from config svr")
 )
 
 func main() {
@@ -126,6 +128,8 @@ func main() {
 		CollectIndexUsageStats:   *collectIndexUsageF,
 		SocketTimeout:            *socketTimeoutF,
 		SyncTimeout:              *syncTimeoutF,
+		EnableMongosShardingStat: *enabledMongosShardingStat,
+		EnableConfigSvrShardingStat:*enabledConfigSvrShardingStat,
 	})
 	prometheus.MustRegister(mongodbCollector)
 

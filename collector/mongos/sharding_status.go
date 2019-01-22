@@ -122,7 +122,7 @@ func IsBalancerEnabled(session *mgo.Session) float64 {
 	return 1
 }
 
-func IsClusterBalanced(session *mgo.Session) float64 {
+func IsClusterBalanced(session *mgo.Session, shardChunkInfoAll *[]ShardingTopoChunkInfo) float64 {
 	// Different thresholds based on size
 	// http://docs.mongodb.org/manual/core/sharding-internals/#sharding-migration-thresholds
 	var threshold float64 = 8
@@ -135,7 +135,6 @@ func IsClusterBalanced(session *mgo.Session) float64 {
 
 	var minChunkCount float64 = -1
 	var maxChunkCount float64 = 0
-	shardChunkInfoAll := GetTotalChunksByShard(session)
 	for _, shard := range *shardChunkInfoAll {
 		if shard.Chunks > maxChunkCount {
 			maxChunkCount = shard.Chunks
@@ -203,10 +202,11 @@ func (status *ShardingStats) Describe(ch chan<- *prometheus.Desc) {
 func GetShardingStatus(session *mgo.Session) *ShardingStats {
 	results := &ShardingStats{}
 
-	results.IsBalanced = IsClusterBalanced(session)
+	shardChunkInfoAll := GetTotalChunksByShard(session)
+	results.IsBalanced = IsClusterBalanced(session, shardChunkInfoAll)
 	results.BalancerEnabled = IsBalancerEnabled(session)
 	results.Changelog = GetShardingChangelogStatus(session)
-	results.Topology = GetShardingTopoStatus(session)
+	results.Topology = GetShardingTopoStatus(session, shardChunkInfoAll)
 	results.Mongos = GetMongosInfo(session)
 	results.BalancerLock = GetMongosBalancerLock(session)
 

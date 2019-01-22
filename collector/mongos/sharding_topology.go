@@ -186,12 +186,12 @@ func (status *ShardingTopoStats) Describe(ch chan<- *prometheus.Desc) {
 	shardingTopoInfoTotalCollections.Describe(ch)
 }
 
-func GetShardingTopoStatus(session *mgo.Session) *ShardingTopoStats {
+func GetShardingTopoStatus(session *mgo.Session, shardChunkInfoAll *[]ShardingTopoChunkInfo) *ShardingTopoStats {
 	results := &ShardingTopoStats{}
 
 	results.Shards = GetShards(session)
 	results.TotalChunks = GetTotalChunks(session)
-	results.ShardChunks = GetTotalChunksByShard(session)
+	results.ShardChunks = shardChunkInfoAll
 	results.TotalDatabases = GetTotalDatabases(session)
 	results.TotalCollections = GetTotalShardedCollections(session)
 
