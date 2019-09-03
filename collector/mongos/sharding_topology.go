@@ -16,6 +16,7 @@ package mongos
 
 import (
 	"context"
+	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/log"
@@ -244,12 +245,35 @@ func (status *ShardingTopoStats) Describe(ch chan<- *prometheus.Desc) {
 // GetShardingTopoStatus gets sharding topo status.
 func GetShardingTopoStatus(client *mongo.Client) *ShardingTopoStats {
 	results := &ShardingTopoStats{}
+	wg := sync.WaitGroup{}
+	wg.Add(5)
 
-	results.Shards = GetShards(client)
-	results.TotalChunks = GetTotalChunks(client)
-	results.ShardChunks = GetTotalChunksByShard(client)
-	results.TotalDatabases = GetTotalDatabases(client)
-	results.TotalCollections = GetTotalShardedCollections(client)
+	go func() {
+		results.Shards = GetShards(client)
+		wg.Done()
+	}()
+
+	go func() {
+		results.TotalChunks = GetTotalChunks(client)
+		wg.Done()
+	}()
+
+	go func() {
+		results.ShardChunks = GetTotalChunksByShard(client)
+		wg.Done()
+	}()
+
+	go func() {
+		results.TotalDatabases = GetTotalDatabases(client)
+		wg.Done()
+	}()
+
+	go func() {
+		results.TotalCollections = GetTotalShardedCollections(client)
+		wg.Done()
+	}()
+
+	wg.Wait()
 
 	return results
 }

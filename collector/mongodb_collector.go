@@ -238,41 +238,67 @@ func (exporter *MongodbCollector) scrape(ch chan<- prometheus.Metric) {
 }
 
 func (exporter *MongodbCollector) collectMongos(client *mongo.Client, ch chan<- prometheus.Metric) {
-	log.Debug("Collecting Server Status")
-	serverStatus := mongos.GetServerStatus(client)
-	if serverStatus != nil {
-		serverStatus.Export(ch)
-	}
+	wg := sync.WaitGroup{}
 
-	log.Debug("Collecting Sharding Status")
-	shardingStatus := mongos.GetShardingStatus(client)
-	if shardingStatus != nil {
-		shardingStatus.Export(ch)
-	}
+	wg.Add(1)
+	go func() {
+		log.Debug("Collecting Server Status")
+		serverStatus := mongos.GetServerStatus(client)
+		if serverStatus != nil {
+			serverStatus.Export(ch)
+		}
+		wg.Done()
+	}()
+
+	wg.Add(1)
+	go func() {
+		log.Debug("Collecting Sharding Status")
+		shardingStatus := mongos.GetShardingStatus(client)
+		if shardingStatus != nil {
+			shardingStatus.Export(ch)
+		}
+		wg.Done()
+	}()
 
 	if exporter.Opts.CollectDatabaseMetrics {
-		log.Debug("Collecting Database Status From Mongos")
-		dbStatList := mongos.GetDatabaseStatList(client)
-		if dbStatList != nil {
-			dbStatList.Export(ch)
-		}
+		wg.Add(1)
+		go func() {
+			log.Debug("Collecting Database Status From Mongos")
+			dbStatList := mongos.GetDatabaseStatList(client)
+			if dbStatList != nil {
+				dbStatList.Export(ch)
+			}
+			wg.Done()
+		}()
+
 	}
 
 	if exporter.Opts.CollectCollectionMetrics {
-		log.Debug("Collecting Collection Status From Mongos")
-		collStatList := mongos.GetCollectionStatList(client)
-		if collStatList != nil {
-			collStatList.Export(ch)
-		}
+		wg.Add(1)
+		go func() {
+			log.Debug("Collecting Collection Status From Mongos")
+			collStatList := mongos.GetCollectionStatList(client)
+			if collStatList != nil {
+				collStatList.Export(ch)
+			}
+			wg.Done()
+		}()
+
 	}
 
 	if exporter.Opts.CollectConnPoolStats {
-		log.Debug("Collecting ConnPoolStats Metrics")
-		connPoolStats := commoncollector.GetConnPoolStats(client)
-		if connPoolStats != nil {
-			connPoolStats.Export(ch)
-		}
+		wg.Add(1)
+		go func() {
+			log.Debug("Collecting ConnPoolStats Metrics")
+			connPoolStats := commoncollector.GetConnPoolStats(client)
+			if connPoolStats != nil {
+				connPoolStats.Export(ch)
+			}
+			wg.Done()
+		}()
 	}
+
+	wg.Wait()
 }
 
 func (exporter *MongodbCollector) collectMongod(client *mongo.Client, ch chan<- prometheus.Metric) {
