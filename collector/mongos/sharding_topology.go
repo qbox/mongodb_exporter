@@ -192,6 +192,8 @@ func (status *ShardingTopoStats) Export(ch chan<- prometheus.Metric) {
 	if status.Shards != nil {
 		var drainingShards float64 = 0
 		for _, shard := range *status.Shards {
+			// set all known shards to zero first so that shards with zero chunks are still displayed properly
+			shardingTopoInfoShardChunks.WithLabelValues(shard.Shard).Set(0)
 			if shard.Draining {
 				drainingShards = drainingShards + 1
 			}
@@ -216,10 +218,6 @@ func (status *ShardingTopoStats) Export(ch chan<- prometheus.Metric) {
 	}
 
 	if status.ShardChunks != nil {
-		// set all known shards to zero first so that shards with zero chunks are still displayed properly
-		for _, shard := range *status.Shards {
-			shardingTopoInfoShardChunks.WithLabelValues(shard.Shard).Set(0)
-		}
 		for _, shard := range *status.ShardChunks {
 			shardingTopoInfoShardChunks.WithLabelValues(shard.Shard).Set(shard.Chunks)
 		}
