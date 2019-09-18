@@ -16,6 +16,7 @@ package mongos
 
 import (
 	"context"
+	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/log"
@@ -191,6 +192,8 @@ func (status *ShardingTopoStats) Export(ch chan<- prometheus.Metric) {
 	if status.Shards != nil {
 		var drainingShards float64 = 0
 		for _, shard := range *status.Shards {
+			// set all known shards to zero first so that shards with zero chunks are still displayed properly
+			shardingTopoInfoShardChunks.WithLabelValues(shard.Shard).Set(0)
 			if shard.Draining {
 				drainingShards = drainingShards + 1
 			}
@@ -215,10 +218,6 @@ func (status *ShardingTopoStats) Export(ch chan<- prometheus.Metric) {
 	}
 
 	if status.ShardChunks != nil {
-		// set all known shards to zero first so that shards with zero chunks are still displayed properly
-		for _, shard := range *status.Shards {
-			shardingTopoInfoShardChunks.WithLabelValues(shard.Shard).Set(0)
-		}
 		for _, shard := range *status.ShardChunks {
 			shardingTopoInfoShardChunks.WithLabelValues(shard.Shard).Set(shard.Chunks)
 		}
@@ -244,12 +243,35 @@ func (status *ShardingTopoStats) Describe(ch chan<- *prometheus.Desc) {
 // GetShardingTopoStatus gets sharding topo status.
 func GetShardingTopoStatus(client *mongo.Client) *ShardingTopoStats {
 	results := &ShardingTopoStats{}
+	wg := sync.WaitGroup{}
+	wg.Add(5)
 
-	results.Shards = GetShards(client)
-	results.TotalChunks = GetTotalChunks(client)
-	results.ShardChunks = GetTotalChunksByShard(client)
-	results.TotalDatabases = GetTotalDatabases(client)
-	results.TotalCollections = GetTotalShardedCollections(client)
+	go func() {
+		results.Shards = GetShards(client)
+		wg.Done()
+	}()
+
+	go func() {
+		results.TotalChunks = GetTotalChunks(client)
+		wg.Done()
+	}()
+
+	go func() {
+		results.ShardChunks = GetTotalChunksByShard(client)
+		wg.Done()
+	}()
+
+	go func() {
+		results.TotalDatabases = GetTotalDatabases(client)
+		wg.Done()
+	}()
+
+	go func() {
+		results.TotalCollections = GetTotalShardedCollections(client)
+		wg.Done()
+	}()
+
+	wg.Wait()
 
 	return results
 }

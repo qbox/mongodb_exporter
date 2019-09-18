@@ -17,6 +17,7 @@ package mongos
 import (
 	"context"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -147,11 +148,12 @@ func IsBalancerEnabled(client *mongo.Client) float64 {
 }
 
 // IsClusterBalanced check is cluster balanced.
-func IsClusterBalanced(client *mongo.Client) float64 {
+func IsClusterBalanced(totalChunkCount float64, shardChunkInfoAll *[]ShardingTopoChunkInfo) float64 {
+
 	// Different thresholds based on size
 	// http://docs.mongodb.org/manual/core/sharding-internals/#sharding-migration-thresholds
 	var threshold float64 = 8
-	totalChunkCount := GetTotalChunks(client)
+
 	if totalChunkCount < 20 {
 		threshold = 2
 	} else if totalChunkCount < 80 && totalChunkCount > 21 {
@@ -160,7 +162,6 @@ func IsClusterBalanced(client *mongo.Client) float64 {
 
 	var minChunkCount float64 = -1
 	var maxChunkCount float64 = 0
-	shardChunkInfoAll := GetTotalChunksByShard(client)
 	for _, shard := range *shardChunkInfoAll {
 		if shard.Chunks > maxChunkCount {
 			maxChunkCount = shard.Chunks
@@ -228,13 +229,39 @@ func (status *ShardingStats) Describe(ch chan<- *prometheus.Desc) {
 // GetShardingStatus gets sharding status.
 func GetShardingStatus(client *mongo.Client) *ShardingStats {
 	results := &ShardingStats{}
+	wg := sync.WaitGroup{}
+	wg.Add(5)
 
-	results.IsBalanced = IsClusterBalanced(client)
-	results.BalancerEnabled = IsBalancerEnabled(client)
-	results.Changelog = GetShardingChangelogStatus(client)
-	results.Topology = GetShardingTopoStatus(client)
-	results.Mongos = GetMongosInfo(client)
-	results.BalancerLock = GetMongosBalancerLock(client)
+	go func() {
+		results.BalancerEnabled = IsBalancerEnabled(client)
+		wg.Done()
+	}()
+
+	go func() {
+		results.Changelog = GetShardingChangelogStatus(client)
+		wg.Done()
+	}()
+
+	go func() {
+		results.Topology = GetShardingTopoStatus(client)
+		wg.Done()
+	}()
+
+	go func() {
+		results.Mongos = GetMongosInfo(client)
+		wg.Done()
+	}()
+
+	go func() {
+		results.BalancerLock = GetMongosBalancerLock(client)
+		wg.Done()
+	}()
+
+	wg.Wait()
+
+	if results.Topology.ShardChunks != nil {
+		results.IsBalanced = IsClusterBalanced(results.Topology.TotalChunks, results.Topology.ShardChunks)
+	}
 
 	return results
 }
