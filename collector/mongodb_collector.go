@@ -35,6 +35,7 @@ const namespace = "mongodb"
 // MongodbCollectorOpts is the options of the mongodb collector.
 type MongodbCollectorOpts struct {
 	URI                      string
+	PingTimeout              time.Duration
 	CollectDatabaseMetrics   bool
 	CollectCollectionMetrics bool
 	CollectTopMetrics        bool
@@ -113,6 +114,14 @@ func (exporter *MongodbCollector) getClient() *mongo.Client {
 	if exporter.mongoClient == nil {
 		return nil
 	}
+
+	ctx, _ := context.WithTimeout(context.Background(), exporter.Opts.PingTimeout)
+	err := exporter.mongoClient.Ping(ctx, nil)
+	if err != nil {
+		log.Debug(err)
+		return nil
+	}
+
 	return exporter.mongoClient
 }
 

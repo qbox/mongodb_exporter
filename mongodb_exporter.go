@@ -53,7 +53,8 @@ var (
 		Default("mongodb://localhost:27017").
 		Envar("MONGODB_URI").
 		String()
-	testF = kingpin.Flag("test", "Check MongoDB connection, print buildInfo() information and exit.").Bool()
+	pingTimeoutF = kingpin.Flag("mongodb.ping-timeout", "Timeout for verifying connection to mongodb.").Default("100ms").Duration()
+	testF        = kingpin.Flag("test", "Check MongoDB connection, print buildInfo() information and exit.").Bool()
 )
 
 func main() {
@@ -83,6 +84,7 @@ func main() {
 	programCollector := version.NewCollector(program)
 	mongodbCollector := collector.NewMongodbCollector(&collector.MongodbCollectorOpts{
 		URI:                      *uriF,
+		PingTimeout:              *pingTimeoutF,
 		CollectDatabaseMetrics:   *collectDatabaseF,
 		CollectCollectionMetrics: *collectCollectionF,
 		CollectTopMetrics:        *collectTopF,
