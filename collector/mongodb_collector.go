@@ -35,34 +35,17 @@ const namespace = "mongodb"
 // MongodbCollectorOpts is the options of the mongodb collector.
 type MongodbCollectorOpts struct {
 	URI                      string
-	TLSConnection            bool
-	TLSCertificateFile       string
-	TLSPrivateKeyFile        string
-	TLSCaFile                string
-	TLSHostnameValidation    bool
-	DBPoolLimit              int
+	PingTimeout              time.Duration
 	CollectDatabaseMetrics   bool
 	CollectCollectionMetrics bool
 	CollectTopMetrics        bool
 	CollectIndexUsageStats   bool
 	CollectConnPoolStats     bool
-	SocketTimeout            time.Duration
-	SyncTimeout              time.Duration
-	AuthentificationDB       string
 }
 
 func (in *MongodbCollectorOpts) toSessionOps() *shared.MongoSessionOpts {
 	return &shared.MongoSessionOpts{
-		URI:                   in.URI,
-		TLSConnection:         in.TLSConnection,
-		TLSCertificateFile:    in.TLSCertificateFile,
-		TLSPrivateKeyFile:     in.TLSPrivateKeyFile,
-		TLSCaFile:             in.TLSCaFile,
-		TLSHostnameValidation: in.TLSHostnameValidation,
-		PoolLimit:             in.DBPoolLimit,
-		SocketTimeout:         in.SocketTimeout,
-		SyncTimeout:           in.SyncTimeout,
-		AuthentificationDB:    in.AuthentificationDB,
+		URI: in.URI,
 	}
 }
 
@@ -131,6 +114,14 @@ func (exporter *MongodbCollector) getClient() *mongo.Client {
 	if exporter.mongoClient == nil {
 		return nil
 	}
+
+	ctx, _ := context.WithTimeout(context.Background(), exporter.Opts.PingTimeout)
+	err := exporter.mongoClient.Ping(ctx, nil)
+	if err != nil {
+		log.Debug(err)
+		return nil
+	}
+
 	return exporter.mongoClient
 }
 
