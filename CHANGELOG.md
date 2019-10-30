@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
+- [PMM-4719](https://jira.percona.com/browse/PMM-4719): Remove redundant flags from "mongodb_exporter" if possible. 
+Those flags have been removed: `--mongodb.authentification-database, --mongodb.max-connections, --mongodb.socket-timeout, --mongodb.sync-timeout`. You can use [connection-string-options](https://docs.mongodb.com/manual/reference/connection-string/#connection-string-options) instead.
+
+### Added
+
+### Fixed
+
+## [0.10.0]
+### Changed
+- `go.mongodb.org/mongo-driver` was updated to `v1.1.1`.
+- All `--mongodb.tls*` flags were removed. Use [tls-options](https://docs.mongodb.com/manual/reference/connection-string/#tls-options) instead.
 
 ### Added
 
@@ -149,7 +160,8 @@ with source code locations.
 ### Added
 - First tagged version.
 
-[Unreleased]: https://github.com/percona/mongodb_exporter/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/percona/mongodb_exporter/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/percona/mongodb_exporter/compare/v0.10.0...v0.9.0
 [0.9.0]: https://github.com/percona/mongodb_exporter/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/percona/mongodb_exporter/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/percona/mongodb_exporter/compare/v0.7.0...v0.7.1
