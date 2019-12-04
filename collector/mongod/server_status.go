@@ -42,6 +42,8 @@ type ServerStatus struct {
 	OpLatencies *OpLatenciesStat `bson:"opLatencies"`
 	Metrics     *MetricsStats    `bson:"metrics"`
 
+	ShardingStatistics *ShardingStatistics `bson:"shardingStatistics"`
+
 	StorageEngine *StorageEngineStats `bson:"storageEngine"`
 	InMemory      *WiredTigerStats    `bson:"inMemory"`
 	RocksDb       *RocksDbStats       `bson:"rocksdb"`
@@ -73,6 +75,9 @@ func (status *ServerStatus) Export(ch chan<- prometheus.Metric) {
 	}
 	if status.Metrics != nil {
 		status.Metrics.Export(ch)
+	}
+	if status.ShardingStatistics != nil {
+		status.ShardingStatistics.Export(ch)
 	}
 	if status.InMemory != nil {
 		status.InMemory.Export(ch)
@@ -127,6 +132,9 @@ func (status *ServerStatus) Describe(ch chan<- *prometheus.Desc) {
 	}
 	if status.StorageEngine != nil {
 		status.StorageEngine.Describe(ch)
+	}
+	if status.ShardingStatistics != nil {
+		status.ShardingStatistics.Describe(ch)
 	}
 	if status.InMemory != nil {
 		status.InMemory.Describe(ch)
