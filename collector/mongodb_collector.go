@@ -36,6 +36,9 @@ const namespace = "mongodb"
 type MongodbCollectorOpts struct {
 	URI                      string
 	PingTimeout              time.Duration
+	ConnectTimeout           time.Duration
+	SocketTimeout            time.Duration
+	MaxPoolSize              uint64
 	CollectDatabaseMetrics   bool
 	CollectCollectionMetrics bool
 	CollectTopMetrics        bool
@@ -45,7 +48,10 @@ type MongodbCollectorOpts struct {
 
 func (in *MongodbCollectorOpts) toSessionOps() *shared.MongoSessionOpts {
 	return &shared.MongoSessionOpts{
-		URI: in.URI,
+		URI:            in.URI,
+		ConnectTimeout: in.ConnectTimeout,
+		SocketTimeout:  in.SocketTimeout,
+		MaxPoolSize:    in.MaxPoolSize,
 	}
 }
 
