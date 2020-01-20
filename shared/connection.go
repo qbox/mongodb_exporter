@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/prometheus/common/log"
 	"go.mongodb.org/mongo-driver/bson"
@@ -52,13 +53,19 @@ func RedactMongoUri(uri string) string {
 }
 
 type MongoSessionOpts struct {
-	URI string
+	URI            string
+	ConnectTimeout time.Duration
+	SocketTimeout  time.Duration
+	MaxPoolSize    uint64
 }
 
 // MongoClient connects to MongoDB and returns ready to use MongoDB client.
 func MongoClient(opts *MongoSessionOpts) *mongo.Client {
 	cOpts := options.Client().
 		ApplyURI(opts.URI).
+		SetConnectTimeout(opts.ConnectTimeout).
+		SetSocketTimeout(opts.SocketTimeout).
+		SetMaxPoolSize(opts.MaxPoolSize).
 		SetDirect(true).
 		SetReadPreference(readpref.Nearest()).
 		SetAppName("mongodb_exporter")
