@@ -53,11 +53,8 @@ var (
 		Default("mongodb://localhost:27017").
 		Envar("MONGODB_URI").
 		String()
-	pingTimeoutF    = kingpin.Flag("mongodb.ping-timeout", "Specifies the time in milliseconds to attempt to ping a server.").Default("100ms").Duration()
-	connectTimeoutF = kingpin.Flag("mongodb.connect-timeout", "Specifies the timeout for an initial connection to a server.").Default("1000ms").Duration()
-	socketTimeoutF  = kingpin.Flag("mongodb.socket-timeout", "Specifies the time in milliseconds to attempt to send or receive on a socket before the attempt times out.").Default("1000ms").Duration()
-	maxPoolSizeF    = kingpin.Flag("mongodb.max-pool-size", "Specifies the max size of a server's connection pool.").Default("5").Uint64()
-	testF           = kingpin.Flag("test", "Check MongoDB connection, print buildInfo() information and exit.").Bool()
+	pingTimeoutF = kingpin.Flag("mongodb.ping-timeout", "Specifies the time in milliseconds to attempt to ping a server.").Default("100ms").Duration()
+	testF        = kingpin.Flag("test", "Check MongoDB connection, print buildInfo() information and exit.").Bool()
 )
 
 func main() {
@@ -86,11 +83,8 @@ func main() {
 
 	programCollector := version.NewCollector(program)
 	mongodbCollector := collector.NewMongodbCollector(&collector.MongodbCollectorOpts{
-		URI:            *uriF,
-		PingTimeout:    *pingTimeoutF,
-		ConnectTimeout: *connectTimeoutF,
-		SocketTimeout:  *socketTimeoutF,
-		MaxPoolSize:    *maxPoolSizeF,
+		URI:         *uriF,
+		PingTimeout: *pingTimeoutF,
 
 		CollectDatabaseMetrics:   *collectDatabaseF,
 		CollectCollectionMetrics: *collectCollectionF,

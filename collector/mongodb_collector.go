@@ -36,9 +36,6 @@ const namespace = "mongodb"
 type MongodbCollectorOpts struct {
 	URI                      string
 	PingTimeout              time.Duration
-	ConnectTimeout           time.Duration
-	SocketTimeout            time.Duration
-	MaxPoolSize              uint64
 	CollectDatabaseMetrics   bool
 	CollectCollectionMetrics bool
 	CollectTopMetrics        bool
@@ -48,10 +45,7 @@ type MongodbCollectorOpts struct {
 
 func (in *MongodbCollectorOpts) toSessionOps() *shared.MongoSessionOpts {
 	return &shared.MongoSessionOpts{
-		URI:            in.URI,
-		ConnectTimeout: in.ConnectTimeout,
-		SocketTimeout:  in.SocketTimeout,
-		MaxPoolSize:    in.MaxPoolSize,
+		URI: in.URI,
 	}
 }
 
@@ -124,7 +118,7 @@ func (exporter *MongodbCollector) getClient() *mongo.Client {
 	ctx, _ := context.WithTimeout(context.Background(), exporter.Opts.PingTimeout)
 	err := exporter.mongoClient.Ping(ctx, nil)
 	if err != nil {
-		log.Debug(err)
+		log.Error(err)
 		return nil
 	}
 
