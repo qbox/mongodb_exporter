@@ -17,18 +17,18 @@ type ApCounters struct {
 	ReadTp              float64 `bson:"readTp"`
 	ErrorApExecutorPool float64 `bson:"error_apexecutor_pool"`
 
-	ReadSlowLog         float64 `bson:"read_slowlog"`
-	ReadApSlowLog       float64 `bson:"read_ap_slowlog"`
-	ReadDSlowLog         float64 `bson:"read_d_slowlog"`
-	ReadApDSlowLog       float64 `bson:"read_ap_d_slowlog"`
-	ReadUnSlowLog       float64 `bson:"read_un_slowlog"`
-	WriteSlowLog        float64 `bson:"write_slowlog"`
-	FamSlowLog          float64 `bson:"fam_slowlog"`
-	CmdSlowLog          float64 `bson:"cmd_slowlog"`
+	ReadSlowLog    float64 `bson:"read_slowlog"`
+	ReadApSlowLog  float64 `bson:"read_ap_slowlog"`
+	ReadDSlowLog   float64 `bson:"read_d_slowlog"`
+	ReadApDSlowLog float64 `bson:"read_ap_d_slowlog"`
+	ReadUnSlowLog  float64 `bson:"read_un_slowlog"`
+	WriteSlowLog   float64 `bson:"write_slowlog"`
+	FamSlowLog     float64 `bson:"fam_slowlog"`
+	CmdSlowLog     float64 `bson:"cmd_slowlog"`
 
-	LimitForLegacy      float64 `bson:"limitForLegacy"`
-	LimitForAsioReqQ    float64 `bson:"limitForAsioReqQ"`
-	LimitForRefresh     float64 `bson:"limitForRefresh"`
+	LimitForLegacy   float64 `bson:"limitForLegacy"`
+	LimitForAsioReqQ float64 `bson:"limitForAsioReqQ"`
+	LimitForRefresh  float64 `bson:"limitForRefresh"`
 }
 
 func (this *ApCounters) Export(ch chan<- prometheus.Metric) {

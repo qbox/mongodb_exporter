@@ -30,7 +30,6 @@ import (
 	"github.com/percona/mongodb_exporter/shared"
 )
 
-
 const namespace = "mongodb"
 
 // MongodbCollectorOpts is the options of the mongodb collector.
@@ -385,7 +384,6 @@ func (exporter *MongodbCollector) collectMongodReplSet(client *mongo.Client, ch 
 		oplogStatus.Export(ch)
 	}
 }
-
 
 // check interface
 var _ prometheus.Collector = (*MongodbCollector)(nil)

@@ -52,7 +52,6 @@ func TestGetShardConnPoolStatsDecodesFine(t *testing.T) {
 		assert.Equal(t, statusReplSet.GlobalPool, (*util.PoolConnStats)(nil), "mongod globalPool must be nil")
 	})
 
-
 	t.Run("mongos", func(t *testing.T) {
 		// setup
 		t.Parallel()

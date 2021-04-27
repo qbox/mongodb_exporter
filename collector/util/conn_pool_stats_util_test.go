@@ -9,28 +9,28 @@ import (
 
 func TestHostConnStats_Add(t *testing.T) {
 	tmp := HostConnStats{
-		InUse: 1,
-		Available: 2,
-		Created: 3,
-		Refreshing: 4,
+		InUse:         1,
+		Available:     2,
+		Created:       3,
+		Refreshing:    4,
 		ReqQueueLimit: 5,
 	}
 
 	tmp2 := HostConnStats{
-		InUse: 5,
-		Available: 4,
-		Created: 3,
-		Refreshing: 2,
+		InUse:         5,
+		Available:     4,
+		Created:       3,
+		Refreshing:    2,
 		ReqQueueLimit: 1,
 	}
 
 	tmp.Add(&tmp2)
 
 	assert.True(t, true, reflect.DeepEqual(tmp, HostConnStats{
-		InUse: 6,
-		Available: 6,
-		Created: 6,
-		Refreshing: 6,
+		InUse:         6,
+		Available:     6,
+		Created:       6,
+		Refreshing:    6,
 		ReqQueueLimit: 6,
 	}))
 }
@@ -88,7 +88,7 @@ func TestPoolsAnaliyze(t *testing.T) {
 	pools := PoolsAnaliyze(res, nameToShards)
 	assert.Equal(t, 2, len(pools), "pool equal to 2")
 
-	if pool,ok := pools["NetworkInterfaceASIO-ShardRegistry"]; ok {
+	if pool, ok := pools["NetworkInterfaceASIO-ShardRegistry"]; ok {
 		assert.NotEqual(t, nil, pool)
 		assert.Equal(t, 1, int(pool.PoolInUse))
 		assert.Equal(t, 3, int(pool.PoolAvailable))
@@ -100,7 +100,7 @@ func TestPoolsAnaliyze(t *testing.T) {
 		assert.Equal(t, true, false, "error")
 	}
 
-	if pool,ok := pools["global"]; ok {
+	if pool, ok := pools["global"]; ok {
 		assert.NotEqual(t, nil, pool)
 		assert.Equal(t, 0, int(pool.PoolInUse))
 		assert.Equal(t, 29, int(pool.PoolAvailable))
@@ -111,6 +111,5 @@ func TestPoolsAnaliyze(t *testing.T) {
 	} else {
 		assert.Equal(t, true, false, "error")
 	}
-
 
 }

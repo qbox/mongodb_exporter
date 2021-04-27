@@ -31,7 +31,7 @@ type ServerStatus struct {
 	Metrics                      *MetricsStats `bson:"metrics"`
 	Apcounters                   *ApCounters   `bson:"apcounters,omitempty"`
 	//mongos这个指标也要用
-	ShardingStatistics 			 *ShardingStatistics `bson:"shardingStatistics,omitempty"`
+	ShardingStatistics *ShardingStatistics `bson:"shardingStatistics,omitempty"`
 }
 
 // Export exports the server status to be consumed by prometheus.
