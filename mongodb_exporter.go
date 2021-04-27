@@ -55,7 +55,7 @@ var (
 		Default("mongodb://localhost:27017").
 		Envar("MONGODB_URI").
 		String()
-	pingTimeoutF = kingpin.Flag("mongodb.ping-timeout", "Specifies the time in milliseconds to attempt to ping a server.").Default("10000ms").Duration()
+	pingTimeoutF = kingpin.Flag("mongodb.ping-timeout", "Specifies the time in milliseconds to attempt to ping a server.").Default("100ms").Duration()
 	testF        = kingpin.Flag("test", "Check MongoDB connection, print buildInfo() information and exit.").Bool()
 )
 

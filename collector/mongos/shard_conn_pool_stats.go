@@ -2,7 +2,6 @@ package mongos
 
 import (
 	"context"
-	"github.com/percona/mongodb_exporter/collector/common"
 	"github.com/percona/mongodb_exporter/collector/util"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/log"
@@ -28,63 +27,63 @@ type shardConnPoolStats struct {
 
 var (
 	shardTotalInUseDesc = prometheus.NewDesc(
-		prometheus.BuildFQName(common.Namespace, "sc_stats", "in_use"),
+		prometheus.BuildFQName(Namespace, "sc_stats", "in_use"),
 		"Corresponds to the total number of client connections to shard mongo currently in use.",
 		nil,
 		nil,
 	)
 
 	shardTotalAvailableDesc = prometheus.NewDesc(
-		prometheus.BuildFQName(common.Namespace, "sc_stats", "available"),
+		prometheus.BuildFQName(Namespace, "sc_stats", "available"),
 		"Corresponds to the total number of client connections to shard mongo that are currently available.",
 		nil,
 		nil,
 	)
 
 	shardTotalCreatedDesc = prometheus.NewDesc(
-		prometheus.BuildFQName(common.Namespace, "sc_stats", "created_total"),
+		prometheus.BuildFQName(Namespace, "sc_stats", "created_total"),
 		"Corresponds to the total number of client connections to shard mongo created since instance start",
 		nil,
 		nil,
 	)
 
 	shardTotalInUseInPoolDesc = prometheus.NewDesc(
-		prometheus.BuildFQName(common.Namespace, "sc_stats", "in_use_in_pool"),
+		prometheus.BuildFQName(Namespace, "sc_stats", "in_use_in_pool"),
 		"Corresponds to the total number of client connections to shard mongo currently in use in a pool.",
 		[]string{"pool"},
 		nil,
 	)
 
 	shardTotalAvailableInPoolDesc = prometheus.NewDesc(
-		prometheus.BuildFQName(common.Namespace, "sc_stats", "available_in_pool"),
+		prometheus.BuildFQName(Namespace, "sc_stats", "available_in_pool"),
 		"Corresponds to the total number of client connections to shard mongo that are currently available in a pool.",
 		[]string{"pool"},
 		nil,
 	)
 
 	shardTotalCreatedInPoolDesc = prometheus.NewDesc(
-		prometheus.BuildFQName(common.Namespace, "sc_stats", "created_in_pool_total"),
+		prometheus.BuildFQName(Namespace, "sc_stats", "created_in_pool_total"),
 		"Corresponds to the total number of client connections to shard mongo created since instance start in a pool",
 		[]string{"pool"},
 		nil,
 	)
 
 	shardInUsePreShardDesc = prometheus.NewDesc(
-		prometheus.BuildFQName(common.Namespace, "sc_stats", "in_use_preshard"),
+		prometheus.BuildFQName(Namespace, "sc_stats", "in_use_preshard"),
 		"Corresponds to the pre shard number of client connections to shard mongo currently in use.",
 		[]string{"set", "pool"},
 		nil,
 	)
 
 	shardAvailablePreShardDesc = prometheus.NewDesc(
-		prometheus.BuildFQName(common.Namespace, "sc_stats", "available_preshard"),
+		prometheus.BuildFQName(Namespace, "sc_stats", "available_preshard"),
 		"Corresponds to the pre shard number of client connections to shard mongo that are currently available.",
 		[]string{"set", "pool"},
 		nil,
 	)
 
 	shardCreatedPreShardDesc = prometheus.NewDesc(
-		prometheus.BuildFQName(common.Namespace, "sc_stats", "created_preshard_total"),
+		prometheus.BuildFQName(Namespace, "sc_stats", "created_preshard_total"),
 		"Corresponds to the pre shard number of client connections to shard mongo created since instance start",
 		[]string{"set", "pool"},
 		nil,
