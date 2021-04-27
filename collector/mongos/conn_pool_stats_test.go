@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package common
+package mongos
 
 import (
 	"context"
+	"github.com/percona/mongodb_exporter/collector/common"
 	"testing"
 	"time"
 
@@ -29,31 +30,20 @@ func TestGetConnPoolStatsDecodesFine(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	t.Run("mongod", func(t *testing.T) {
+	t.Run("mongos", func(t *testing.T) {
 		// setup
 		t.Parallel()
-		defaultClient := testutils.MustGetConnectedMongodClient(ctx, t)
-		defer defaultClient.Disconnect(ctx)
+		mongosClient := testutils.MustGetConnectedMongosClient(ctx, t)
+		defer mongosClient.Disconnect(ctx)
+		hostToShardName, err := GetHostToShardNameMap(mongosClient)
 
+		assert.Equal(t, nil, err, "err must be nil")
+		assert.NotEqual(t, len(hostToShardName), 0, "hostToShardName must be great than 0")
 		// run
-		statusDefault := GetConnPoolStats(defaultClient, nil)
+		statusMongos := common.GetConnPoolStats(mongosClient, hostToShardName)
 
 		// test
-		assert.NotNil(t, statusDefault)
-		assert.Equal(t, 0, len(statusDefault.Pools), "pool len is zero")
-	})
-
-	t.Run("replset", func(t *testing.T) {
-		// setup
-		t.Parallel()
-		replSetClient := testutils.MustGetConnectedReplSetClient(ctx, t)
-		defer replSetClient.Disconnect(ctx)
-
-		// run
-		statusReplSet := GetConnPoolStats(replSetClient, nil)
-		assert.Equal(t, 0, len(statusReplSet.Pools), "pool len is zero")
-
-		// test
-		assert.NotNil(t, statusReplSet)
+		assert.NotNil(t, statusMongos)
+		assert.NotEqual(t, len(statusMongos.Pools), 0, "mongos pools len must be not 0")
 	})
 }

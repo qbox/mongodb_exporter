@@ -16,6 +16,7 @@ package mongos
 
 import (
 	"context"
+	"github.com/prometheus/common/log"
 	"testing"
 	"time"
 
@@ -31,7 +32,7 @@ func TestParserServerStatus(t *testing.T) {
 
 	serverStatus := &ServerStatus{}
 
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://10.34.62.46:15650"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,6 +74,14 @@ func TestParserServerStatus(t *testing.T) {
 	if serverStatus.Metrics == nil {
 		t.Error("Metrics group was not loaded")
 	}
+
+	if serverStatus.Apcounters != nil {
+		log.Infof("apCounter:%+v", serverStatus.Apcounters)
+	}
+
+	if serverStatus.ShardingStatistics != nil {
+		log.Infof("catalogCache:%+v", serverStatus.ShardingStatistics)
+	}
 }
 
 func loadServerStatusFromBson(data []byte, status *ServerStatus) {
@@ -94,4 +103,5 @@ func TestGetServerStatusDecodesFine(t *testing.T) {
 
 	// test
 	assert.NotNil(t, statusDefault)
+	assert.Equal(t, nil, statusDefault.Apcounters, "apcounter is nil in mongod")
 }

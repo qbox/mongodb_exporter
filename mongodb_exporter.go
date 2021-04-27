@@ -42,18 +42,20 @@ var (
 	listenAddressF = kingpin.Flag("web.listen-address", "Address to listen on for web interface and telemetry.").Default(":9216").String()
 	metricsPathF   = kingpin.Flag("web.telemetry-path", "Path under which to expose metrics.").Default("/metrics").String()
 
-	collectDatabaseF             = kingpin.Flag("collect.database", "Enable collection of Database metrics").Bool()
-	collectCollectionF           = kingpin.Flag("collect.collection", "Enable collection of Collection metrics").Bool()
-	collectTopF                  = kingpin.Flag("collect.topmetrics", "Enable collection of table top metrics").Bool()
-	collectIndexUsageF           = kingpin.Flag("collect.indexusage", "Enable collection of per index usage stats").Bool()
-	mongodbCollectConnPoolStatsF = kingpin.Flag("collect.connpoolstats", "Collect MongoDB connpoolstats").Bool()
+	collectDatabaseF                  = kingpin.Flag("collect.database", "Enable collection of Database metrics").Bool()
+	collectCollectionF                = kingpin.Flag("collect.collection", "Enable collection of Collection metrics").Bool()
+	collectTopF                       = kingpin.Flag("collect.topmetrics", "Enable collection of table top metrics").Bool()
+	collectIndexUsageF                = kingpin.Flag("collect.indexusage", "Enable collection of per index usage stats").Bool()
+	mongodbCollectConnPoolStatsF      = kingpin.Flag("collect.connpoolstats", "Collect MongoDB connpoolstats").Bool()
+	mongodbShardCollectConnPoolStatsF = kingpin.Flag("collect.shardconnpoolstats", "Collect MongoDB shardconnpoolstats").Bool()
+	connectionDetailSwitch            = kingpin.Flag("collect.connectiondetail", "Collect MongoDB connection detail info").Bool()
 
 	uriF = kingpin.Flag("mongodb.uri", "MongoDB URI, format").
 		PlaceHolder("[mongodb://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]").
 		Default("mongodb://localhost:27017").
 		Envar("MONGODB_URI").
 		String()
-	pingTimeoutF = kingpin.Flag("mongodb.ping-timeout", "Specifies the time in milliseconds to attempt to ping a server.").Default("100ms").Duration()
+	pingTimeoutF = kingpin.Flag("mongodb.ping-timeout", "Specifies the time in milliseconds to attempt to ping a server.").Default("10000ms").Duration()
 	testF        = kingpin.Flag("test", "Check MongoDB connection, print buildInfo() information and exit.").Bool()
 )
 
@@ -86,12 +88,18 @@ func main() {
 		URI:         *uriF,
 		PingTimeout: *pingTimeoutF,
 
-		CollectDatabaseMetrics:   *collectDatabaseF,
-		CollectCollectionMetrics: *collectCollectionF,
-		CollectTopMetrics:        *collectTopF,
-		CollectIndexUsageStats:   *collectIndexUsageF,
-		CollectConnPoolStats:     *mongodbCollectConnPoolStatsF,
+		CollectDatabaseMetrics:    *collectDatabaseF,
+		CollectCollectionMetrics:  *collectCollectionF,
+		CollectTopMetrics:         *collectTopF,
+		CollectIndexUsageStats:    *collectIndexUsageF,
+		CollectConnPoolStats:      *mongodbCollectConnPoolStatsF,
+		CollectShardConnPoolStats: *mongodbShardCollectConnPoolStatsF,
+		CollectConnDetailSwitch:   *connectionDetailSwitch,
 	})
+	if mongodbCollector != nil && mongodbCollector.Opts != nil {
+		log.Infof("commandLine info:%+v", *mongodbCollector.Opts)
+	}
+
 	prometheus.MustRegister(programCollector, mongodbCollector)
 
 	promHandler := promhttp.InstrumentMetricHandler(prometheus.DefaultRegisterer, promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{ErrorHandling: promhttp.ContinueOnError}))

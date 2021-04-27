@@ -30,17 +30,20 @@ import (
 	"github.com/percona/mongodb_exporter/shared"
 )
 
+
 const namespace = "mongodb"
 
 // MongodbCollectorOpts is the options of the mongodb collector.
 type MongodbCollectorOpts struct {
-	URI                      string
-	PingTimeout              time.Duration
-	CollectDatabaseMetrics   bool
-	CollectCollectionMetrics bool
-	CollectTopMetrics        bool
-	CollectIndexUsageStats   bool
-	CollectConnPoolStats     bool
+	URI                       string
+	PingTimeout               time.Duration
+	CollectDatabaseMetrics    bool
+	CollectCollectionMetrics  bool
+	CollectTopMetrics         bool
+	CollectIndexUsageStats    bool
+	CollectConnPoolStats      bool
+	CollectShardConnPoolStats bool
+	CollectConnDetailSwitch   bool
 }
 
 func (in *MongodbCollectorOpts) toSessionOps() *shared.MongoSessionOpts {
@@ -229,6 +232,15 @@ func (exporter *MongodbCollector) scrape(ch chan<- prometheus.Metric) {
 }
 
 func (exporter *MongodbCollector) collectMongos(client *mongo.Client, ch chan<- prometheus.Metric) {
+	var hostToShardName map[string]string = nil
+	if exporter.Opts.CollectConnDetailSwitch && (exporter.Opts.CollectConnPoolStats || exporter.Opts.CollectShardConnPoolStats) {
+		tmp, err := mongos.GetHostToShardNameMap(client)
+		if err != nil {
+			hostToShardName = nil
+		} else {
+			hostToShardName = tmp
+		}
+	}
 	wg := sync.WaitGroup{}
 
 	wg.Add(1)
@@ -281,9 +293,21 @@ func (exporter *MongodbCollector) collectMongos(client *mongo.Client, ch chan<- 
 		wg.Add(1)
 		go func() {
 			log.Debug("Collecting ConnPoolStats Metrics")
-			connPoolStats := commoncollector.GetConnPoolStats(client)
+			connPoolStats := commoncollector.GetConnPoolStats(client, hostToShardName)
 			if connPoolStats != nil {
 				connPoolStats.Export(ch)
+			}
+			wg.Done()
+		}()
+	}
+
+	if exporter.Opts.CollectShardConnPoolStats {
+		wg.Add(1)
+		go func() {
+			log.Infof("Collecting ShardConnPoolStats Metrics")
+			shardConnPoolStats := mongos.GetShardConnPoolStats(client, hostToShardName)
+			if shardConnPoolStats != nil {
+				shardConnPoolStats.Export(ch)
 			}
 			wg.Done()
 		}()
@@ -333,7 +357,7 @@ func (exporter *MongodbCollector) collectMongod(client *mongo.Client, ch chan<- 
 
 	if exporter.Opts.CollectConnPoolStats {
 		log.Debug("Collecting ConnPoolStats Metrics")
-		connPoolStats := commoncollector.GetConnPoolStats(client)
+		connPoolStats := commoncollector.GetConnPoolStats(client, nil)
 		if connPoolStats != nil {
 			connPoolStats.Export(ch)
 		}
@@ -361,6 +385,7 @@ func (exporter *MongodbCollector) collectMongodReplSet(client *mongo.Client, ch 
 		oplogStatus.Export(ch)
 	}
 }
+
 
 // check interface
 var _ prometheus.Collector = (*MongodbCollector)(nil)
