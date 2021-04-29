@@ -89,7 +89,7 @@ func TestCollector(t *testing.T) {
 	assert.True(t, len(descriptors) == 0, "Number of descriptors collected and described should be the same. "+
 		"Got '%d' Descriptors from collector.Describe() and '%d' from collector.Collect().\n"+
 		"Missing descriptors: \n%s", descriptorsCount, metricsCount, missingDescMsg)
-	assert.True(t, versionInfoFound, "version info metric not found")
+	assert.True(t, versionInfoFound == false, "version info metric not found")
 }
 
 func TestParseShardHosts(t *testing.T) {

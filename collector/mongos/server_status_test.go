@@ -32,7 +32,7 @@ func TestParserServerStatus(t *testing.T) {
 
 	serverStatus := &ServerStatus{}
 
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://10.34.62.46:15650"))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://127.0.0.1:27017"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,5 +103,6 @@ func TestGetServerStatusDecodesFine(t *testing.T) {
 
 	// test
 	assert.NotNil(t, statusDefault)
-	assert.Equal(t, nil, statusDefault.Apcounters, "apcounter is nil in mongod")
+	var tmpNil *ApCounters = nil
+	assert.Equal(t, tmpNil, statusDefault.Apcounters, "apcounter is nil in mongod")
 }

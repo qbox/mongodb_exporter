@@ -24,8 +24,15 @@ Flags:
       --collect.topmetrics     Enable collection of table top metrics
       --collect.indexusage     Enable collection of per index usage stats
       --collect.connpoolstats  Collect MongoDB connpoolstats
+      --collect.shardconnpoolstats  
+                               Collect MongoDB shardconnpoolstats
+      --collect.connectiondetail  
+                               Collect MongoDB connection detail info
       --mongodb.uri=[mongodb://][user:pass@]host1[:port1][,host2[:port2],...][/database][?options]  
                                MongoDB URI, format
+      --mongodb.ping-timeout=100ms  
+                               Specifies the time in milliseconds to attempt to
+                               ping a server.
       --test                   Check MongoDB connection, print buildInfo()
                                information and exit.
       --version                Show application version.

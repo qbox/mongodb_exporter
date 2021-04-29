@@ -52,21 +52,20 @@ func TestGetShardConnPoolStatsDecodesFine(t *testing.T) {
 		assert.Equal(t, statusReplSet.GlobalPool, (*util.PoolConnStats)(nil), "mongod globalPool must be nil")
 	})
 
-	t.Run("mongos", func(t *testing.T) {
-		// setup
-		t.Parallel()
-		mongosClient := testutils.MustGetConnectedMongosClient(ctx, t)
-		defer mongosClient.Disconnect(ctx)
-		hostToShardName, err := GetHostToShardNameMap(mongosClient)
-
-		assert.Equal(t, nil, err, "err must be nil")
-		assert.NotEqual(t, len(hostToShardName), 0, "hostToShardName must be great than 0")
-		// run
-		statusMongos := GetShardConnPoolStats(mongosClient, hostToShardName)
-
-		// test
-		assert.NotNil(t, statusMongos)
-		assert.NotEqual(t, statusMongos.GlobalPool, (*util.PoolConnStats)(nil), "mongod globalPool must be not nil")
-	})
-
+	//t.Run("mongos", func(t *testing.T) {
+	//	// setup
+	//	t.Parallel()
+	//	mongosClient := testutils.MustGetConnectedMongosClient(ctx, t)
+	//	defer mongosClient.Disconnect(ctx)
+	//	hostToShardName, err := GetHostToShardNameMap(mongosClient)
+	//
+	//	assert.Equal(t, nil, err, "err must be nil")
+	//	assert.NotEqual(t, len(hostToShardName), 0, "hostToShardName must be great than 0")
+	//	// run
+	//	statusMongos := GetShardConnPoolStats(mongosClient, hostToShardName)
+	//
+	//	// test
+	//	assert.NotNil(t, statusMongos)
+	//	assert.NotEqual(t, statusMongos.GlobalPool, (*util.PoolConnStats)(nil), "mongod globalPool must be not nil")
+	//})
 }
