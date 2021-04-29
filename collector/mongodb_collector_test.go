@@ -20,6 +20,7 @@ import (
 	"github.com/prometheus/common/log"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/percona/exporter_shared/helpers"
 	"github.com/stretchr/testify/assert"
@@ -45,6 +46,7 @@ func TestCollector(t *testing.T) {
 		CollectCollectionMetrics: true,
 		CollectTopMetrics:        true,
 		CollectIndexUsageStats:   true,
+		PingTimeout:              time.Second,
 	})
 
 	descCh := make(chan *prometheus.Desc)
