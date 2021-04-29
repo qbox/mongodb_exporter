@@ -16,6 +16,7 @@ package collector
 
 import (
 	"fmt"
+	"github.com/percona/mongodb_exporter/collector/mongos"
 	"github.com/prometheus/common/log"
 	"os"
 	"testing"
@@ -93,7 +94,7 @@ func TestCollector(t *testing.T) {
 
 func TestParseShardHosts(t *testing.T) {
 	host := "shard0/kodo-rsdb-shardsvr0-0.kodo-rsdb-shardsvr0.kodo-shenmengye.svc:27017,kodo-rsdb-shardsvr0-1.kodo-rsdb-shardsvr0.kodo-shenmengye.svc:27017,kodo-rsdb-shardsvr0-2.kodo-rsdb-shardsvr0.kodo-shenmengye.svc:27017"
-	setName, hosts, err := ParseShardHosts(host)
+	setName, hosts, err := mongos.ParseShardHosts(host)
 
 	assert.True(t, err == nil, "err != nil")
 	assert.True(t, setName == "shard0", "setName is not equal shard0")
