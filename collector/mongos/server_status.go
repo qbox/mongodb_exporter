@@ -28,8 +28,10 @@ import (
 // ServerStatus keeps the data returned by the serverStatus() method.
 type ServerStatus struct {
 	commoncollector.ServerStatus `bson:",inline"`
-
-	Metrics *MetricsStats `bson:"metrics"`
+	Metrics                      *MetricsStats `bson:"metrics"`
+	Apcounters                   *ApCounters   `bson:"apcounters,omitempty"`
+	//mongos这个指标也要用
+	ShardingStatistics *ShardingStatistics `bson:"shardingStatistics,omitempty"`
 }
 
 // Export exports the server status to be consumed by prometheus.
@@ -37,6 +39,13 @@ func (status *ServerStatus) Export(ch chan<- prometheus.Metric) {
 	status.ServerStatus.Export(ch)
 	if status.Metrics != nil {
 		status.Metrics.Export(ch)
+	}
+	if status.Apcounters != nil {
+		status.Apcounters.Export(ch)
+	}
+
+	if status.ShardingStatistics != nil {
+		status.ShardingStatistics.Export(ch)
 	}
 }
 

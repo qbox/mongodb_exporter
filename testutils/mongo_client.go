@@ -35,3 +35,16 @@ func MustGetConnectedMongodClient(ctx context.Context, t *testing.T) *mongo.Clie
 
 	return client
 }
+
+// MustGetConnectedMongosClient return mongo.Client instance connected to server started in shard mode.
+//func MustGetConnectedMongosClient(ctx context.Context, t *testing.T) *mongo.Client {
+//	opts := options.Client().
+//		ApplyURI("mongodb://127.0.0.1:27018/admin").
+//		SetDirect(true).SetServerSelectionTimeout(time.Second)
+//	client, err := mongo.Connect(ctx, opts)
+//	if err != nil {
+//		t.Fatalf("Couldn't connect to Mongos instance, reason: %v", err)
+//	}
+//
+//	return client
+//}

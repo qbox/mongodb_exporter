@@ -16,6 +16,8 @@ package mongos
 
 import (
 	"context"
+	"errors"
+	"strings"
 	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -274,4 +276,55 @@ func GetShardingTopoStatus(client *mongo.Client) *ShardingTopoStats {
 	wg.Wait()
 
 	return results
+}
+
+var (
+	InValidShardHost = errors.New("this host is invalid")
+)
+
+func GetHostToShardNameMap(client *mongo.Client) (map[string]string, error) {
+	shards := GetShards(client)
+	if shards == nil || len(*shards) == 0 {
+		log.Errorf("failed to get shardinfo")
+		return nil, errors.New("failed to get shardInfo")
+	}
+
+	hostToShardname := make(map[string]string)
+	for _, item := range *shards {
+		if len(item.Host) == 0 {
+			continue
+		}
+		name, hosts, err := ParseShardHosts(item.Host)
+		if err != nil {
+			log.Errorf("host is invalid, host:%v", item)
+			continue
+		}
+		for _, host := range hosts {
+			if len(host) == 0 {
+				continue
+			}
+			if _, ok := hostToShardname[host]; !ok {
+				hostToShardname[host] = name
+			}
+		}
+	}
+	return hostToShardname, nil
+}
+
+func ParseShardHosts(host string) (setName string, hosts []string, err error) {
+	idx := strings.Index(host, "/")
+	if idx != -1 && idx != 0 {
+		setName = host[0:idx]
+		if len(setName) == 0 {
+			return "", []string{}, InValidShardHost
+		}
+
+		hosts = strings.Split(host[idx+1:], ",")
+		if len(hosts) == 0 {
+			return "", []string{}, InValidShardHost
+		}
+		return
+	}
+
+	return "", []string{}, InValidShardHost
 }

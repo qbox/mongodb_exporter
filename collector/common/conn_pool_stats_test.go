@@ -36,11 +36,11 @@ func TestGetConnPoolStatsDecodesFine(t *testing.T) {
 		defer defaultClient.Disconnect(ctx)
 
 		// run
-		statusDefault := GetConnPoolStats(defaultClient)
+		statusDefault := GetConnPoolStats(defaultClient, nil)
 
 		// test
 		assert.NotNil(t, statusDefault)
-		assert.Equal(t, 1.0, statusDefault.Ok)
+		assert.Equal(t, 0, len(statusDefault.Pools), "pool len is zero")
 	})
 
 	t.Run("replset", func(t *testing.T) {
@@ -50,10 +50,10 @@ func TestGetConnPoolStatsDecodesFine(t *testing.T) {
 		defer replSetClient.Disconnect(ctx)
 
 		// run
-		statusReplSet := GetConnPoolStats(replSetClient)
+		statusReplSet := GetConnPoolStats(replSetClient, nil)
+		assert.Equal(t, 0, len(statusReplSet.Pools), "pool len is zero")
 
 		// test
 		assert.NotNil(t, statusReplSet)
-		assert.Equal(t, 1.0, statusReplSet.Ok)
 	})
 }

@@ -16,8 +16,11 @@ package collector
 
 import (
 	"fmt"
+	"github.com/percona/mongodb_exporter/collector/mongos"
+	"github.com/prometheus/common/log"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/percona/exporter_shared/helpers"
 	"github.com/stretchr/testify/assert"
@@ -43,6 +46,7 @@ func TestCollector(t *testing.T) {
 		CollectCollectionMetrics: true,
 		CollectTopMetrics:        true,
 		CollectIndexUsageStats:   true,
+		PingTimeout:              time.Second,
 	})
 
 	descCh := make(chan *prometheus.Desc)
@@ -88,4 +92,14 @@ func TestCollector(t *testing.T) {
 		"Got '%d' Descriptors from collector.Describe() and '%d' from collector.Collect().\n"+
 		"Missing descriptors: \n%s", descriptorsCount, metricsCount, missingDescMsg)
 	assert.True(t, versionInfoFound, "version info metric not found")
+}
+
+func TestParseShardHosts(t *testing.T) {
+	host := "shard0/kodo-rsdb-shardsvr0-0.kodo-rsdb-shardsvr0.kodo-shenmengye.svc:27017,kodo-rsdb-shardsvr0-1.kodo-rsdb-shardsvr0.kodo-shenmengye.svc:27017,kodo-rsdb-shardsvr0-2.kodo-rsdb-shardsvr0.kodo-shenmengye.svc:27017"
+	setName, hosts, err := mongos.ParseShardHosts(host)
+
+	assert.True(t, err == nil, "err != nil")
+	assert.True(t, setName == "shard0", "setName is not equal shard0")
+	assert.True(t, len(hosts) == 3, "hosts len is not equal 3")
+	log.Infof("%v, %v, %v", setName, hosts, err)
 }
