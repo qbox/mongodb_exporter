@@ -76,15 +76,15 @@ snapshot: $(GOPATH)/bin/goreleaser
 release:
 	@echo ">> building binary"
 	@CGO_ENABLED=0 $(GO) build -v \
-		-ldflags '\
-		-X '${GO_PACKAGE}/vendor/github.com/percona/pmm/version.ProjectName=$(BIN_NAME)' \
-		-X '${GO_PACKAGE}/vendor/github.com/percona/pmm/version.Version=$(APP_VERSION)' \
-		-X '${GO_PACKAGE}/vendor/github.com/percona/pmm/version.PMMVersion=$(PMM_RELEASE_VERSION)' \
-		-X '${GO_PACKAGE}/vendor/github.com/percona/pmm/version.Timestamp=$(PMM_RELEASE_TIMESTAMP)' \
-		-X '${GO_PACKAGE}/vendor/github.com/percona/pmm/version.FullCommit=$(PMM_RELEASE_FULLCOMMIT)' \
-		-X '${GO_PACKAGE}/vendor/github.com/percona/pmm/version.Branch=$(PMM_RELEASE_BRANCH)' \
-		-X '${GO_PACKAGE}/vendor/github.com/prometheus/common/version.BuildUser=$(USER)@$(TRAVIS_APP_HOST)' \
-		'\
+		-ldflags "\
+		-X '$(GO_PACKAGE)/vendor/github.com/percona/pmm/version.ProjectName=$(BIN_NAME)' \
+		-X '$(GO_PACKAGE)/vendor/github.com/percona/pmm/version.Version=$(APP_VERSION)' \
+		-X '$(GO_PACKAGE)/vendor/github.com/percona/pmm/version.PMMVersion=$(PMM_RELEASE_VERSION)' \
+		-X '$(GO_PACKAGE)/vendor/github.com/percona/pmm/version.Timestamp=$(PMM_RELEASE_TIMESTAMP)' \
+		-X '$(GO_PACKAGE)/vendor/github.com/percona/pmm/version.FullCommit=$(PMM_RELEASE_FULLCOMMIT)' \
+		-X '$(GO_PACKAGE)/vendor/github.com/percona/pmm/version.Branch=$(PMM_RELEASE_BRANCH)' \
+		-X '$(GO_PACKAGE)/vendor/github.com/prometheus/common/version.BuildUser=$(USER)@$(TRAVIS_APP_HOST)' \
+		"\
 		-o $(BIN_DIR)/$(BIN_NAME) .
 
 community-release: $(GOPATH)/bin/goreleaser
