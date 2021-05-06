@@ -159,7 +159,7 @@ type connPoolStats struct {
 	TotalCreated          float64                         `bson:"totalCreated"`
 	TotalRefreshing       float64                         `bson:"totalRefreshing"`
 	TotalReqQueueLimit    float64                         `bson:"totalReqQueueLimit,omitempty"`
-	Pools                 map[string]interface{}          `bson:"pools"`
+	Pools                 map[string]interface{}          `bson:"pools,omitempty"`
 	ReplicaSets           map[string]util.ReplicaSetStats `bson:"replicaSets,omitempty"`
 
 	Ok float64 `bson:"ok"`
